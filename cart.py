@@ -87,6 +87,44 @@ class CartPoleEnv(gym.Env):
             pole.add_attr(self.carttrans)
             self.viewer.add_geom(pole)
             self.axle=rendering.make_circle(polewidth/2)
+	        self.axle.add_attr(self.poletrans)
+	        self.axle.add_attr(self.carttrans)
+	        self.viewer.add_geom(pole)
+            self.axle=rendering.Transform(translation=(0,axleoffset))
+            pole.add_attr(self.poletrans)
+            pole.add_attr(self.carttrans)
+            self.viewer.add_geom(pole)
+            self.axle = rendering.make_circle(polewidth/2)
+            self.axle.add_attr(self.poletrans)
+            self.axle.add_attr(self.carttrans)
+            self.axle.set_color(.5,.5,.8)
+            self.viewer.add_geom(self.axle)
+            self.track = rendering.Line((0,carty), (screen_width,carty))
+            self.track.set_color(0,0,0)
+            self.viewer.add_geom(self.track)
+
+        if self.state is None: return None
+
+        x = self.state
+        cartx = x[0]*scale+screen_width/2.0 # MIDDLE OF CART
+        self.carttrans.set_translation(cartx, carty)
+        self.poletrans.set_rotation(-x[2])
+
+        return self.viewer.render(return_rgb_array = mode=='rgb_array')            
+
             
-        
+    def _step(self,action):
+        assert self.action_space.contains(action),"%r (%s) invalid"%(action,type(action))
+        state=self.state
+        x,x_dot,theta,w=state #w is the angular velocity
+        force=self.force_mag if action==1 else -self.force_mag
+        costheta=math.cos(theta)
+        sintheta=math.sin(theta)
+        temp=(force+self.polemass_length*w*w*sintheta)/self.total_mass
+        alpha=(self.gravity*sintheta-costheta*temp)/(self.length*(4.0/3.0-self.masspole*costheta*costheta/self.total_mass))
+        xacc=temp-self.polemass_length*alpha*costheta/self.total_mass
+        x=x+self.tau*x_dot
+                            
+                            
+                          
         
