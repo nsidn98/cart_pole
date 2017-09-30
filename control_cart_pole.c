@@ -11,7 +11,8 @@ static float q_val[NUM_BOXES][2];  //state action values
 static first_time=1;
 static int current_action,prev_action;
 static int current_state,prev_state;
-//static char rcs_controller_id[] = "$Id: q.c,v 1.1.1.1 1995/02/10 21:49:24 finton Exp $";
+static char rcs_controller_id[] = "$Id: q.c,v 1.1.1.1 1995/02/10 21:49:24 finton Exp $";
+int get_box(float x,float velocity,float theta,float ang_velocity);
 
 /*
 	get_action returns either 0 or 1 
@@ -26,7 +27,7 @@ int get_action(float x,float velocity,float theta,float ang_velocity,float reinf
 	int state_box(float x,float velocity,float theta,float ang_velocity);
 	double rnd(double,double);
 	void srandom(int);
-	void reset reset_controller(void);	//reset state/ction before new trial
+	void reset_controller(void);	//reset state/ction before new trial
 
 	if(first_time){
 		first_time=0;
@@ -48,7 +49,7 @@ int get_action(float x,float velocity,float theta,float ang_velocity,float reinf
 	prev_action=current_action;
 	current_state=get_box(x,velocity,theta,ang_velocity);
 
-	if(prev_action!==-1) //update except forthe first action
+	if(prev_action!=-1) //update except forthe first action
 	{
 		if(current_state==-1)
 			predicted_value=0.0;//failure state has Q-value of 0 since the value won't be updated
@@ -75,7 +76,7 @@ int get_action(float x,float velocity,float theta,float ang_velocity,float reinf
 double rnd(double low_bound,double hi_bound) //it scales the output to the range [low_bound,hi_bound]
 {
 	long random(void);			//random number generator
-	double highest=(double)RAND_MAX;
+	double highest=(double)((1 << 31) -1);
 	//if rand_max is not defined then try((1<<31)-1)
 	return (random()/highest)*(hi_bound-low_bound)+low_bound;
 }
@@ -94,7 +95,7 @@ void reset_controller(void)
 #define twelve_degrees 0.2094384
 #define fifty_degrees 0.87266
 
-int get_action(float x,float velocity,float theta,float,ang_velocity)
+int get_box(float x,float velocity,float theta,float ang_velocity)
 {
 	int box=0;
 
