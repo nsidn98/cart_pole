@@ -1,6 +1,6 @@
 import numpy as np
 import math
-importgym 
+import gym 
 import logging
 from gym import spaces
 from gym.utils import seeding
